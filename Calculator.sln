@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 14 for Windows Desktop
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalcEnv", "CalcEnv\CalcEnv.vcxproj", "{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CalcEnvTest", "CalcEnvTest\CalcEnvTest.vcxproj", "{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89} = {85548ECE-9DF5-4E04-8A55-69BBE08EEA89}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtCalculatorUi", "QtCalculatorUi\Build\QtCalculatorUi.vcxproj", "{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89} = {85548ECE-9DF5-4E04-8A55-69BBE08EEA89}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Debug|x64.ActiveCfg = Debug|x64
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Debug|x64.Build.0 = Debug|x64
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Debug|x86.ActiveCfg = Debug|Win32
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Debug|x86.Build.0 = Debug|Win32
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Release|x64.ActiveCfg = Release|x64
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Release|x64.Build.0 = Release|x64
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Release|x86.ActiveCfg = Release|Win32
+		{85548ECE-9DF5-4E04-8A55-69BBE08EEA89}.Release|x86.Build.0 = Release|Win32
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Debug|x64.ActiveCfg = Debug|x64
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Debug|x64.Build.0 = Debug|x64
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Debug|x86.ActiveCfg = Debug|Win32
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Debug|x86.Build.0 = Debug|Win32
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Release|x64.ActiveCfg = Release|x64
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Release|x64.Build.0 = Release|x64
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Release|x86.ActiveCfg = Release|Win32
+		{13B3ACA6-AA70-4105-A88B-DE3DC75475C6}.Release|x86.Build.0 = Release|Win32
+		{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}.Debug|x64.ActiveCfg = Debug|Win32
+		{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}.Debug|x86.ActiveCfg = Debug|Win32
+		{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}.Debug|x86.Build.0 = Debug|Win32
+		{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}.Release|x64.ActiveCfg = Release|Win32
+		{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}.Release|x86.ActiveCfg = Release|Win32
+		{35D28234-A3F6-3BF9-81EE-B62F5011B4A3}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

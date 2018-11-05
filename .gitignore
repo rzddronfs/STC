@@ -3,3 +3,5 @@ Debug
 *.db
 ipch
 *.user
+bin
+*.opendb
