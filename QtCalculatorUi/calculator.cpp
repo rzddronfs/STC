@@ -4,18 +4,25 @@
 #include <iomanip>
 #include <string>
 #include <cassert>
-#include <exception>
 
 
 void OutputFetcher::DoWork() 
 {
+  try
+  {
     m_result.swap( m_calcWorker->WaitForResult() );           
     emit ResultReady();
+  }
+  catch( ... )
+  {
+    m_exception = std::current_exception();
+    emit ExceptionThrown();
+  }
 }
 
 Calculator::Calculator(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::Calculator),
+    ui( new Ui::Calculator ),
     m_calcWorker( new CalcWorker() )
 {
     ui->setupUi(this);
@@ -23,6 +30,8 @@ Calculator::Calculator(QWidget *parent) :
     m_outputFetcher->moveToThread( &m_outputThread );
     connect( this, &Calculator::ProcessOutput, m_outputFetcher.data(), &OutputFetcher::DoWork);
     connect( m_outputFetcher.data(), &OutputFetcher::ResultReady, this, &Calculator::OnOutputReady);
+    connect( this, &Calculator::ExceptionThrown, this, &Calculator::OnException);
+    connect( m_outputFetcher.data(), &OutputFetcher::ExceptionThrown, this, &Calculator::OnFetcherException);
     m_outputThread.start( QThread::LowestPriority );
     emit ProcessOutput();
 }
@@ -31,7 +40,6 @@ Calculator::~Calculator()
 {
     m_outputThread.quit();
     m_outputThread.wait();
-    delete ui;
 }
 
 TypeWork Calculator::FindTypeWork( const std::wstring & token ) const
@@ -53,8 +61,40 @@ TypeWork Calculator::FindTypeWork( const std::wstring & token ) const
     throw std::runtime_error( "Invalid opcode" );
 }
 
+void Calculator::OnException()
+{
+  QString message;
+
+  try
+  {
+    std::exception_ptr e = m_exception;
+    m_exception = nullptr;
+    std::rethrow_exception( e );
+  }
+  catch( const std::exception & e )
+  {
+    message = QString( e.what() );
+  }
+  catch( ... )
+  {
+    message = QString( "Unknown exception" );
+  }
+
+  ui->resultsListing->appendHtml( 
+    QString( "<b><font color=\"red\">" ) + "Error: " + message.toHtmlEscaped() + "</font></b>" );
+}
+
+void Calculator::OnFetcherException()
+{
+  m_exception = m_outputFetcher->GetException();
+  m_outputFetcher->ResetException();
+  OnException();
+}
+
 void Calculator::on_inputLine_returnPressed()
 {
+  try
+  {
     const QString & expression = ui->inputLine->text();
     std::wstringstream rawExpression;
     rawExpression.str( expression.toStdWString() + L'\n' );
@@ -81,7 +121,14 @@ void Calculator::on_inputLine_returnPressed()
     m_calcWorker->EnqueueRequest( calcTask );
 
     ui->inputLine->clear();
-    ui->resultsListing->appendHtml( QString( "<font color=\"green\">" ) + expression + "</font>" );
+    ui->resultsListing->appendHtml( 
+      QString( "<font color=\"green\">" ) + expression.toHtmlEscaped() + "</font>" );
+  }
+  catch( ... )
+  {
+    m_exception = std::current_exception();
+    emit ExceptionThrown();
+  }
 }
 
 std::string Calculator::FindErrorMessage( ErrorCode ec ) const
@@ -104,25 +151,43 @@ std::string Calculator::FindErrorMessage( ErrorCode ec ) const
 
 void Calculator::OnOutputReady()
 {
-  const QQueue< CalcResult > & calcResult = m_outputFetcher->GetResult();
+  try
+  {
+    const QQueue< CalcResult > & calcResult = m_outputFetcher->GetResult();
 
-  if( calcResult.empty() )
-    return;
+    if( calcResult.empty() )
+      return;
 
-  const CalcResult & result = calcResult.front(); 
+    const CalcResult & result = calcResult.front(); 
 
-  std::stringstream formatter;
-  formatter << std::fixed << std::setprecision( 2 );
-  formatter << "<font color=\"red\">" << FindErrorMessage( result.errorCode ) << "</font>" 
-    << "<font color=\"blue\">" << result.value << "</font>" << std::flush;
+    std::stringstream formatter;
+    formatter << std::fixed << std::setprecision( 2 );
+    formatter << "<font color=\"red\">" 
+      << QString( FindErrorMessage( result.errorCode ).c_str() ).toHtmlEscaped().toStdString() 
+      << "</font>" 
+      << "<font color=\"blue\">" << result.value << "</font>" << std::flush;
   
-  ui->resultsListing->appendHtml( QString( formatter.str().c_str() ) );
-  emit ProcessOutput();
+    ui->resultsListing->appendHtml( QString( formatter.str().c_str() ) );
+    emit ProcessOutput();
+  }
+  catch( ... )
+  {
+    m_exception = std::current_exception();
+    emit ExceptionThrown();
+  }
 }
 
 void Calculator::closeEvent( QCloseEvent * event )
 {
-  m_calcWorker.reset();
-  return QMainWindow::closeEvent( event );
+  try
+  {
+    m_calcWorker.reset();
+    return QMainWindow::closeEvent( event );
+  }
+  catch( ... )
+  {
+    m_exception = std::current_exception();
+    emit ExceptionThrown();
+  }
 }
 
