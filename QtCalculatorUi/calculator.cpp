@@ -81,7 +81,7 @@ void Calculator::on_inputLine_returnPressed()
     m_calcWorker->EnqueueRequest( calcTask );
 
     ui->inputLine->clear();
-    ui->resultsListing->appendPlainText( expression );
+    ui->resultsListing->appendHtml( QString( "<font color=\"green\">" ) + expression + "</font>" );
 }
 
 std::string Calculator::FindErrorMessage( ErrorCode ec ) const
@@ -113,9 +113,10 @@ void Calculator::OnOutputReady()
 
   std::stringstream formatter;
   formatter << std::fixed << std::setprecision( 2 );
-  formatter << FindErrorMessage( result.errorCode ) << result.value << std::flush;
+  formatter << "<font color=\"red\">" << FindErrorMessage( result.errorCode ) << "</font>" 
+    << "<font color=\"blue\">" << result.value << "</font>" << std::flush;
   
-  ui->resultsListing->appendPlainText( QString( formatter.str().c_str() ) );
+  ui->resultsListing->appendHtml( QString( formatter.str().c_str() ) );
   emit ProcessOutput();
 }
 
