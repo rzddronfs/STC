@@ -81,7 +81,7 @@ void Calculator::OnException()
   }
 
   ui->resultsListing->appendHtml( 
-    QString( "<b><font color=\"red\">" ) + "Error: " + message.toHtmlEscaped() + "</font></b>" );
+    EntagWithHtml( QString( "Error: " ) + message, ExceptionFormatTag() ) ); 
 }
 
 void Calculator::OnFetcherException()
@@ -116,13 +116,16 @@ void Calculator::on_inputLine_returnPressed()
     rawExpression >> calcTask.valueA >> Utility::SkipComma >> calcTask.valueB;
 
     if( !rawExpression.good() )
-        throw std::runtime_error( "Invalid format: must be <opcode>,<value>,<value>" );
+        throw std::runtime_error( GetInvalidFormatMessage() );
+
+    if( (rawExpression >> Utility::SkipComma).good() )
+      if( !(rawExpression >> calcTask.minDuration).good() )
+        throw std::runtime_error( GetInvalidFormatMessage() );
 
     m_calcWorker->EnqueueRequest( calcTask );
 
     ui->inputLine->clear();
-    ui->resultsListing->appendHtml( 
-      QString( "<font color=\"green\">" ) + expression.toHtmlEscaped() + "</font>" );
+    ui->resultsListing->appendHtml( EntagWithHtml( expression, EchoFormatTag() ) );
   }
   catch( ... )
   {
@@ -149,6 +152,26 @@ std::string Calculator::FindErrorMessage( ErrorCode ec ) const
   throw std::logic_error( "This code is supposed to be unreachable" );
 }
 
+QString Calculator::EntagWithHtml(const QString & message, ErrorCodeFormatTag) const
+{
+  return QString( "<font color=\"red\">" ) + message.toHtmlEscaped() + "</font>"; 
+}
+
+QString Calculator::EntagWithHtml(const QString & message, ExceptionFormatTag) const
+{
+  return QString( "<b><font color=\"red\">" ) + message.toHtmlEscaped() + "</font></b>";
+}
+
+QString Calculator::EntagWithHtml(const QString & message, ResultFormatTag) const
+{
+  return QString( "<font color=\"blue\">" ) + message.toHtmlEscaped() + "</font>";
+}
+
+QString Calculator::EntagWithHtml(const QString & message, EchoFormatTag) const
+{
+  return QString( "<font color=\"green\">" ) + message.toHtmlEscaped() + "</font>";
+}
+
 void Calculator::OnOutputReady()
 {
   try
@@ -161,13 +184,13 @@ void Calculator::OnOutputReady()
     const CalcResult & result = calcResult.front(); 
 
     std::stringstream formatter;
-    formatter << std::fixed << std::setprecision( 2 );
-    formatter << "<font color=\"red\">" 
-      << QString( FindErrorMessage( result.errorCode ).c_str() ).toHtmlEscaped().toStdString() 
-      << "</font>" 
-      << "<font color=\"blue\">" << result.value << "</font>" << std::flush;
+    formatter << std::fixed << std::setprecision( 2 ) << result.value << std::flush;
   
-    ui->resultsListing->appendHtml( QString( formatter.str().c_str() ) );
+    ui->resultsListing->appendHtml(    
+      EntagWithHtml( FindErrorMessage( result.errorCode ).c_str(), ErrorCodeFormatTag() )
+      + EntagWithHtml( formatter.str().c_str(), ResultFormatTag() )
+    );
+
     emit ProcessOutput();
   }
   catch( ... )

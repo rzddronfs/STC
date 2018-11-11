@@ -44,6 +44,15 @@ class Calculator : public QMainWindow
 {
     Q_OBJECT
 
+private:
+   struct ErrorCodeFormatTag{};
+   struct ExceptionFormatTag{};
+   struct ResultFormatTag{};
+   struct EchoFormatTag{};
+
+public:
+  static constexpr const char* GetInvalidFormatMessage() { return "Invalid format: must be <opcode>,<value>,<value>[,<timeout>]"; } 
+
 public:
     explicit Calculator(QWidget *parent = nullptr);
     ~Calculator();
@@ -64,6 +73,10 @@ protected:
 private:
     TypeWork FindTypeWork( const std::wstring & token ) const;
     std::string FindErrorMessage( ErrorCode ec ) const;
+    QString EntagWithHtml( const QString & message, ErrorCodeFormatTag ) const;
+    QString EntagWithHtml( const QString & message, ExceptionFormatTag ) const;
+    QString EntagWithHtml( const QString & message, ResultFormatTag ) const;
+    QString EntagWithHtml( const QString & message, EchoFormatTag ) const;
 
 private:
     QScopedPointer< Ui::Calculator > ui;
