@@ -10,7 +10,7 @@ void OutputFetcher::DoWork()
 {
   try
   {
-    m_result.swap( m_calcWorker->WaitForResult() );           
+    m_calcWorker->WaitForResult().swap( m_result );
     emit ResultReady();
   }
   catch( ... )
