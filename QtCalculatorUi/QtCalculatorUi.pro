@@ -34,7 +34,8 @@ HEADERS += \
     calcworker.h
 
 FORMS += \
-        calculator.ui
+        calculator.ui \
+    frontend.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -177,6 +177,17 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">UIC ../calculator.ui</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_calculator.h;%(Outputs)</Outputs>
     </CustomBuild>
+    <CustomBuild Include="..\frontend.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\calculator.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Qt\5.6.3\msvc2015\bin\uic.exe ..\calculator.ui -o ui_frontend.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">UIC ../frontend.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ui_frontend.h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\frontend.ui;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Qt\5.6.3\msvc2015\bin\uic.exe ..\frontend.ui -o ui_frontend.h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">UIC ../frontend.ui</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ui_frontend.h;%(Outputs)</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

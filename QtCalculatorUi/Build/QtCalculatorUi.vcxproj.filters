@@ -65,9 +65,15 @@
     <ClInclude Include="ui_calculator.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="ui_frontend.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\calculator.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\frontend.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
