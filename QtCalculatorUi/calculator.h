@@ -79,7 +79,7 @@ private:
     QString EntagWithHtml( const QString & message, EchoFormatTag ) const;
 
 private:
-    QScopedPointer< Ui::Calculator > ui;
+    Ui::Calculator* ui;
     QScopedPointer< CalcWorker > m_calcWorker;
     QThread m_outputThread;
     QScopedPointer< OutputFetcher > m_outputFetcher;

@@ -27,14 +27,20 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         calculator.cpp \
-    calcworker.cpp
+    calcworker.cpp \
+    frontend.cpp \
+    frontend.cpp
 
 HEADERS += \
         calculator.h \
-    calcworker.h
+    calcworker.h \
+    frontend.h \
+    frontend.h
 
 FORMS += \
         calculator.ui \
+    frontend.ui \
+    frontend.ui \
     frontend.ui
 
 # Default rules for deployment.

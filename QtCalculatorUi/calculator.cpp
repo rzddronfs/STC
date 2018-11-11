@@ -22,9 +22,11 @@ void OutputFetcher::DoWork()
 
 Calculator::Calculator(QWidget *parent) :
     QMainWindow(parent),
-    ui( new Ui::Calculator ),
+    ui( nullptr ),
     m_calcWorker( new CalcWorker() )
 {
+    QScopedPointer< Ui::Calculator > uiPtr( new Ui::Calculator() );
+    ui = uiPtr.data();
     ui->setupUi(this);
     m_outputFetcher.reset( new OutputFetcher( *m_calcWorker ) );
     m_outputFetcher->moveToThread( &m_outputThread );
@@ -34,12 +36,14 @@ Calculator::Calculator(QWidget *parent) :
     connect( m_outputFetcher.data(), &OutputFetcher::ExceptionThrown, this, &Calculator::OnFetcherException);
     m_outputThread.start( QThread::LowestPriority );
     emit ProcessOutput();
+    ui = uiPtr.take();
 }
 
 Calculator::~Calculator()
 {
     m_outputThread.quit();
     m_outputThread.wait();
+    delete ui;
 }
 
 TypeWork Calculator::FindTypeWork( const std::wstring & token ) const
