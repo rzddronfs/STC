@@ -20,6 +20,9 @@ private slots:
 
 private:
     Ui::Frontend *ui;
+
+private:
+    QScopedPointer< Ui::Frontend > m_ui;
 };
 
 #endif // FRONTEND_H

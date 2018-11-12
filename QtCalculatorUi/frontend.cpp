@@ -1,14 +1,13 @@
 #include "frontend.h"
 #include "ui_frontend.h"
 
+
 Frontend::Frontend(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Frontend)
+    m_ui(new Ui::Frontend)
 {
+    ui = m_ui.data();
     ui->setupUi(this);
 }
 
-Frontend::~Frontend()
-{
-    delete ui;
-}
+Frontend::~Frontend() = default;

@@ -78,8 +78,12 @@ private:
     QString EntagWithHtml( const QString & message, ResultFormatTag ) const;
     QString EntagWithHtml( const QString & message, EchoFormatTag ) const;
 
+// Qt wizard expects this expression
 private:
     Ui::Calculator* ui;
+
+private:
+    QScopedPointer< Ui::Calculator > m_ui;
     QScopedPointer< CalcWorker > m_calcWorker;
     QThread m_outputThread;
     QScopedPointer< OutputFetcher > m_outputFetcher;
