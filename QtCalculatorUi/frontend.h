@@ -53,6 +53,7 @@ private slots:
 
 private:
   void AppendDigit( const char* digit );
+  bool AcceptValue( double* result );
 
 private:
     Ui::Frontend *ui;

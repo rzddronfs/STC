@@ -23,7 +23,8 @@ void OutputFetcher::DoWork()
 Calculator::Calculator(QWidget *parent) :
     QMainWindow(parent),
     m_ui( new Ui::Calculator() ),
-    m_calcWorker( new CalcWorker() )
+    m_calcWorker( new CalcWorker() ),
+    m_frontend( new Frontend() )
 {
     ui = m_ui.data();
     ui->setupUi(this);
@@ -205,6 +206,7 @@ void Calculator::closeEvent( QCloseEvent * event )
 {
   try
   {
+    m_frontend.reset();
     m_calcWorker.reset();
     return QMainWindow::closeEvent( event );
   }

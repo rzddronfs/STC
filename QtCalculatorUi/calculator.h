@@ -2,6 +2,7 @@
 #define CALCULATOR_H
 
 #include "calcworker.h"
+#include "frontend.h"
 #include <QMainWindow>
 #include <exception>
 
@@ -85,6 +86,7 @@ private:
 private:
     QScopedPointer< Ui::Calculator > m_ui;
     QScopedPointer< CalcWorker > m_calcWorker;
+    QScopedPointer< Frontend > m_frontend;
     QThread m_outputThread;
     QScopedPointer< OutputFetcher > m_outputFetcher;
     std::exception_ptr m_exception = nullptr;
