@@ -1,7 +1,7 @@
 #ifndef CALCWORKER_H
 #define CALCWORKER_H
 
-#include "../CalcEnv/CalcEnv.h"
+#include <CalcEnv.h>
 #include <QQueue>
 #include <QMutex>
 #include <QtConcurrent/QtConcurrent>
