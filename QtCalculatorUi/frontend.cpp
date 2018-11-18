@@ -1,6 +1,8 @@
 #include "frontend.h"
 #include "ui_frontend.h"
+#include "calculator.h"
 #include <sstream>
+#include <iomanip>
 #include <cassert>
 
 
@@ -18,6 +20,13 @@ Frontend::~Frontend()// = default;
   assert( value );
 }
 
+void Frontend::SetResult(double value)
+{
+  std::stringstream formatter;
+  formatter << std::fixed << value;
+  ui->lineDisplay->setText( formatter.str().c_str() );
+}
+
 void Frontend::AppendDigit( const char* digit )
 {
   const QString & text = ui->lineDisplay->text();
@@ -25,20 +34,43 @@ void Frontend::AppendDigit( const char* digit )
   ui->lineDisplay->setText( result );
 }
 
-bool Frontend::AcceptValue(double * result)
+QString Frontend::PrepareOperation(TypeWork opcode)
 {
-  assert( result );
-  const QString & text = ui->lineDisplay->text();
-  std::stringstream parser;
-  parser.str( text.toStdString() + "\n" );
-  parser >> *result;
-  return parser.good();
+  QString result;
+
+  switch(opcode)
+  {
+    case TypeWork::twAdd:
+      result += "+";
+    break;
+
+    case TypeWork::twSubtract:
+      result += "-";
+    break;
+
+    case TypeWork::twMultiply:
+      result += "*";
+    break;
+
+    case TypeWork::twDivide:
+      result += "/";
+    break;
+
+    default:
+      assert( false );
+      throw std::logic_error( "unknown operation" );
+  }
+
+  result += QString( "," ) + ui->lineDisplay->text();
+  ui->lineDisplay->setText( "0" );
+
+  return result;
 }
 
 void Frontend::on_pushButton_clear_clicked()
 {
   ui->lineDisplay->setText( "0" );
-  m_calcTask = CalcTask();
+  m_taskExpression.clear();
 }
 
 void Frontend::on_pushButton_0_clicked()
@@ -93,26 +125,22 @@ void Frontend::on_pushButton_9_clicked()
 
 void Frontend::on_pushButton_divide_clicked()
 {
-  m_calcTask.opcode = TypeWork::twDivide;
-  AcceptValue( &m_calcTask.valueA ); 
+  m_taskExpression = PrepareOperation( TypeWork::twDivide );
 }
 
 void Frontend::on_pushButton_multiply_clicked()
 {
-  m_calcTask.opcode = TypeWork::twMultiply;
-  AcceptValue( &m_calcTask.valueA ); 
+  m_taskExpression = PrepareOperation( TypeWork::twMultiply );
 }
 
 void Frontend::on_pushButton_minus_clicked()
 {
-  m_calcTask.opcode = TypeWork::twSubtract;
-  AcceptValue( &m_calcTask.valueA ); 
+  m_taskExpression = PrepareOperation( TypeWork::twSubtract );
 }
 
 void Frontend::on_pushButton_plus_clicked()
 {
-  m_calcTask.opcode = TypeWork::twAdd;
-  AcceptValue( &m_calcTask.valueA );
+  m_taskExpression = PrepareOperation( TypeWork::twAdd );
 }
 
 void Frontend::on_pushButton_point_clicked()
@@ -122,5 +150,6 @@ void Frontend::on_pushButton_point_clicked()
 
 void Frontend::on_pushButton_evaluate_clicked()
 {
-  AcceptValue( &m_calcTask.valueB );
+  m_taskExpression += QString( "," ) + ui->lineDisplay->text();
+  emit Evaluate();
 }

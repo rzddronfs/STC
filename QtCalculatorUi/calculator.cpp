@@ -1,5 +1,6 @@
 #include "calculator.h"
 #include "ui_calculator.h"
+#include "frontend.h"
 #include <sstream>
 #include <iomanip>
 #include <string>
@@ -34,12 +35,15 @@ Calculator::Calculator(QWidget *parent) :
     connect( m_outputFetcher.data(), &OutputFetcher::ResultReady, this, &Calculator::OnOutputReady);
     connect( this, &Calculator::ExceptionThrown, this, &Calculator::OnException);
     connect( m_outputFetcher.data(), &OutputFetcher::ExceptionThrown, this, &Calculator::OnFetcherException);
+    connect( m_frontend.data(), &Frontend::Evaluate, this, &Calculator::OnAddTask );
     m_outputThread.start( QThread::LowestPriority );
     emit ProcessOutput();
 }
 
 Calculator::~Calculator()
 {
+    m_outputFetcher.reset();
+    m_calcWorker.reset();
     m_outputThread.quit();
     m_outputThread.wait();
 }
@@ -174,6 +178,12 @@ QString Calculator::EntagWithHtml(const QString & message, EchoFormatTag) const
   return QString( "<font color=\"green\">" ) + message.toHtmlEscaped() + "</font>";
 }
 
+void Calculator::OnAddTask()
+{
+   ui->inputLine->setText( m_frontend->GetTaskExpression() );
+   on_inputLine_returnPressed();
+}
+
 void Calculator::OnOutputReady()
 {
   try
@@ -186,12 +196,14 @@ void Calculator::OnOutputReady()
     const CalcResult & result = calcResult.front(); 
 
     std::stringstream formatter;
-    formatter << std::fixed << std::setprecision( 2 ) << result.value << std::flush;
+    formatter << std::fixed << result.value << std::flush;
   
     ui->resultsListing->appendHtml(    
       EntagWithHtml( FindErrorMessage( result.errorCode ).c_str(), ErrorCodeFormatTag() )
       + EntagWithHtml( formatter.str().c_str(), ResultFormatTag() )
     );
+
+    m_frontend->SetResult( result.value );
 
     emit ProcessOutput();
   }
@@ -206,7 +218,8 @@ void Calculator::closeEvent( QCloseEvent * event )
 {
   try
   {
-    m_frontend.reset();
+    m_frontend->close();
+    m_outputFetcher.reset();
     m_calcWorker.reset();
     return QMainWindow::closeEvent( event );
   }
@@ -215,5 +228,11 @@ void Calculator::closeEvent( QCloseEvent * event )
     m_exception = std::current_exception();
     emit ExceptionThrown();
   }
+}
+
+void Calculator::setVisible(bool visible)
+{
+    QMainWindow::setVisible( visible );
+    m_frontend->setVisible( visible );
 }
 

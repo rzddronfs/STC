@@ -1,7 +1,6 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include "Calcworker.h"
 #include <QWidget>
 
 namespace Ui {
@@ -15,6 +14,12 @@ class Frontend : public QWidget
 public:
     explicit Frontend(QWidget *parent = nullptr);
     ~Frontend();
+
+    const QString & GetTaskExpression() const { return m_taskExpression; }
+    void SetResult( double value );
+
+signals:
+    void Evaluate();
 
 private slots:
     void on_pushButton_0_clicked();
@@ -53,14 +58,14 @@ private slots:
 
 private:
   void AppendDigit( const char* digit );
-  bool AcceptValue( double* result );
+  QString PrepareOperation( enum TypeWork opcode );
 
 private:
     Ui::Frontend *ui;
 
 private:
     QScopedPointer< Ui::Frontend > m_ui;
-    CalcTask m_calcTask;
+    QString m_taskExpression;
 };
 
 #endif // FRONTEND_H

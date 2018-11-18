@@ -2,9 +2,11 @@
 #define CALCULATOR_H
 
 #include "calcworker.h"
-#include "frontend.h"
 #include <QMainWindow>
 #include <exception>
+
+
+class Frontend;
 
 
 namespace Ui {
@@ -59,6 +61,7 @@ public:
     ~Calculator();
 
 private slots:
+    void OnAddTask();
     void OnOutputReady();
     void OnException();
     void OnFetcherException();
@@ -70,6 +73,7 @@ signals:
 
 protected:
   void closeEvent( QCloseEvent * event ) override;
+  void setVisible( bool visible ) override;
 
 private:
     TypeWork FindTypeWork( const std::wstring & token ) const;
@@ -85,10 +89,10 @@ private:
 
 private:
     QScopedPointer< Ui::Calculator > m_ui;
+    QScopedPointer< OutputFetcher > m_outputFetcher;
     QScopedPointer< CalcWorker > m_calcWorker;
     QScopedPointer< Frontend > m_frontend;
     QThread m_outputThread;
-    QScopedPointer< OutputFetcher > m_outputFetcher;
     std::exception_ptr m_exception = nullptr;
 };
 
