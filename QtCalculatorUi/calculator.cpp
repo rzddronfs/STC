@@ -42,10 +42,12 @@ Calculator::Calculator(QWidget *parent) :
 
 Calculator::~Calculator()
 {
-    m_outputFetcher.reset();
-    m_calcWorker.reset();
+    disconnect( this );
+    m_frontend.reset();
     m_outputThread.quit();
+    m_calcWorker.reset();
     m_outputThread.wait();
+    m_outputFetcher.reset();
 }
 
 TypeWork Calculator::FindTypeWork( const std::wstring & token ) const
@@ -219,8 +221,6 @@ void Calculator::closeEvent( QCloseEvent * event )
   try
   {
     m_frontend->close();
-    m_outputFetcher.reset();
-    m_calcWorker.reset();
     return QMainWindow::closeEvent( event );
   }
   catch( ... )

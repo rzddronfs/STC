@@ -49,6 +49,8 @@ private:
     QQueue< CalcResult > m_QueueResults;
     QFuture< void > m_workerFuture;
     QWaitCondition m_resultCondition;
+    QWaitCondition m_requestCondition;
+    QSemaphore m_exitSemaphore;
 };
 
 #endif // CALCWORKER_H

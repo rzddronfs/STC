@@ -12,11 +12,18 @@ CalcWorker::CalcWorker()
 
 CalcWorker::~CalcWorker()
 {
-    m_resultCondition.wakeAll();
-    QMutexLocker lock( &m_RequestMutex );
+    QMutexLocker lockRequests( &m_RequestMutex );
     m_StopFlag = true;
-    lock.unlock();
+    lockRequests.unlock();
+    m_requestCondition.wakeAll();
     m_workerFuture.waitForFinished();
+
+    // This spin is needed since waking on QWaitCondition
+    // is asynchronous operation and there is a chance where
+    // CalcWorker is awaited from a lower priority thread
+    // then the one running the destructor.
+    while( m_exitSemaphore.available() )
+      std::this_thread::yield();
 }
 
 
@@ -24,6 +31,8 @@ void CalcWorker::EnqueueRequest( const CalcTask & task )
 {
     QMutexLocker lock( &m_RequestMutex );
     m_QueueRequests.enqueue( task );
+    lock.unlock();
+    m_requestCondition.wakeAll();
 }
 
 CalcResult CalcWorker::DequeueResult()
@@ -52,6 +61,14 @@ QQueue< CalcResult > CalcWorker::TryDequeueResult()
 
 QQueue< CalcResult > CalcWorker::WaitForResult()
 {
+    struct Sentry
+    {
+      QSemaphore & m_exitSemaphore;
+      Sentry( QSemaphore & s ) : m_exitSemaphore( s ) { m_exitSemaphore.release(); }
+      ~Sentry(){ m_exitSemaphore.acquire(); }
+    }
+    const sentry( this->m_exitSemaphore );
+
     QMutexLocker lock( &m_ResultMutex );
 
     m_resultCondition.wait( &m_ResultMutex );
@@ -89,7 +106,7 @@ ErrorCode CalcWorker::FindErrorValue( int value ) const
 }
 
 void CalcWorker::EnqueueResult( const CalcResult & result )
-{  
+{
     QMutexLocker resultLock( &m_ResultMutex );
     m_QueueResults.enqueue( result );
     resultLock.unlock();
@@ -102,12 +119,17 @@ void CalcWorker::DoWork()
    {
         QMutexLocker lock( &m_RequestMutex );
 
+        // The premature check is needed since the attempt to wake could
+        // be made before this thread entered in awaiting state.
         if( m_StopFlag )
             break;
 
-        if( m_QueueRequests.empty() )
-            continue;
+        m_requestCondition.wait( &m_RequestMutex );
 
+        if( m_StopFlag )
+            break;
+
+        assert( !m_QueueRequests.empty() );
         const CalcTask & task = m_QueueRequests.dequeue();
 
         lock.unlock();
@@ -128,4 +150,6 @@ void CalcWorker::DoWork()
 
         EnqueueResult( result );
    }
+
+   m_resultCondition.wakeAll();
 }

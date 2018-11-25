@@ -14,11 +14,7 @@ Frontend::Frontend(QWidget *parent) :
     ui->setupUi(this);
 }
 
-Frontend::~Frontend()// = default;
-{
-  bool value = true;
-  assert( value );
-}
+Frontend::~Frontend() = default;
 
 void Frontend::SetResult(double value)
 {
